@@ -203,15 +203,23 @@ const Navbar = ({ imagePath, setImagePath, currentImageUrl, onClearWorkspace, ad
             alert('No image to process');
             return;
         }
-        
-        const data = await apiRequest(API_ENDPOINTS.LOWPASS_FILTER, {
+        const response = await fetch('http://localhost:5000/api/lowpass-filter', {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
                 imagePath: imagePath,
                 kernelSize: 25,  // Default kernel size
                 sigma: 0  // Default sigma (auto)
             })
         });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
 
         if (data.status === 'success') {
             setImagePath(data.filepath);
