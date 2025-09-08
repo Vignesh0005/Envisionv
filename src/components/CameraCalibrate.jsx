@@ -124,12 +124,27 @@ const CameraCalibrate = ({ imagePath }) => {
   // Modify getScaledCoordinates to get actual coordinates
   const getScaledCoordinates = (clientX, clientY) => {
     const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    
     const rect = canvas.getBoundingClientRect();
     
-    // Convert click coordinates to canvas coordinates
-    const x = (clientX - rect.left) * (canvas.width / rect.width);
-    const y = (clientY - rect.top) * (canvas.height / rect.height);
-    return { x, y };
+    // Get mouse position relative to the canvas viewport
+    const mouseX = clientX - rect.left;
+    const mouseY = clientY - rect.top;
+    
+    // Calculate the scale factor between canvas internal resolution and displayed size
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    // Convert to canvas coordinates accounting for the scaling
+    const x = mouseX * scaleX;
+    const y = mouseY * scaleY;
+    
+    // Ensure coordinates are within canvas bounds
+    const clampedX = Math.max(0, Math.min(x, canvas.width));
+    const clampedY = Math.max(0, Math.min(y, canvas.height));
+    
+    return { x: clampedX, y: clampedY };
   };
 
   // Function to save the canvas as image

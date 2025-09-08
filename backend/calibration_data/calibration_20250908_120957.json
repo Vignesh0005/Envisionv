@@ -1,0 +1,26 @@
+{
+    "magnification": "100Xx",
+    "pixelDistance": 455.8273381294964,
+    "realDistance": 1,
+    "unit": "mm",
+    "calibrationRatio": 0.002193813131313131,
+    "timestamp": "2025-09-08T06:39:57.821Z",
+    "imagePath": "C:\\Users\\Public\\MicroScope_Images\\microscope_100x_20250905_152531_lowpass.jpg",
+    "name": "100X Calibration",
+    "points": {
+        "point1": {
+            "x": 795.6258992805756,
+            "y": 1052.4804149773408
+        },
+        "point2": {
+            "x": 1251.453237410072,
+            "y": 1052.4804149773408
+        }
+    },
+    "coordinates": {
+        "point1X": 795.6258992805756,
+        "point1Y": 1052.4804149773408,
+        "point2X": 1251.453237410072,
+        "point2Y": 1052.4804149773408
+    }
+}

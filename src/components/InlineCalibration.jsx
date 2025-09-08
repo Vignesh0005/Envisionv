@@ -51,11 +51,18 @@ const InlineCalibration = ({ imagePath, onCalibrationComplete, onClose, setCalib
 
     const canvas = e.target;
     const rect = canvas.getBoundingClientRect();
+    
+    // Get mouse position relative to the canvas viewport
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    // Calculate the scale factor between canvas internal resolution and displayed size
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
     
-    const x = (e.clientX - rect.left) * scaleX;
-    const y = (e.clientY - rect.top) * scaleY;
+    // Convert to canvas coordinates accounting for the scaling
+    const x = mouseX * scaleX;
+    const y = mouseY * scaleY;
 
     if (!calibrationPoints.point1) {
       // First point - set the horizontal line Y position
@@ -77,11 +84,18 @@ const InlineCalibration = ({ imagePath, onCalibrationComplete, onClose, setCalib
   const handleCanvasMouseMove = (e) => {
     const canvas = e.target;
     const rect = canvas.getBoundingClientRect();
+    
+    // Get mouse position relative to the canvas viewport
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    // Calculate the scale factor between canvas internal resolution and displayed size
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
     
-    const x = (e.clientX - rect.left) * scaleX;
-    const y = (e.clientY - rect.top) * scaleY;
+    // Convert to canvas coordinates accounting for the scaling
+    const x = mouseX * scaleX;
+    const y = mouseY * scaleY;
     
     // If we have a horizontal line, snap the Y coordinate to it
     const snappedY = horizontalLineY !== null ? horizontalLineY : y;

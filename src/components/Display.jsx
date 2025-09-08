@@ -40,6 +40,9 @@ const Display = ({
 
   // Add state for measurements display
   const [measurements, setMeasurements] = useState([]);
+  
+  // Add state for debugging click coordinates
+  const [debugClick, setDebugClick] = useState(null);
 
   // Add canvas context ref
   const ctxRef = useRef(null);
@@ -198,20 +201,35 @@ const Display = ({
   // Update coordinate calculation for zoomed view
   const getCanvasCoordinates = (e) => {
     const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    
     const rect = canvas.getBoundingClientRect();
     
-    // Calculate the actual scale factor between canvas internal size and displayed size
+    // The canvas is centered using transform: translate(-50%, -50%)
+    // So we need to account for this centering offset
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    // Get mouse position relative to the canvas center
+    const mouseX = e.clientX - centerX;
+    const mouseY = e.clientY - centerY;
+    
+    // Calculate the scale factor between canvas internal resolution and displayed size
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
     
-    // Get mouse position relative to the canvas
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+    // Convert to canvas coordinates accounting for the scaling and centering
+    // Add half the canvas size to get the correct position
+    const canvasX = (mouseX * scaleX) + (canvas.width / 2);
+    const canvasY = (mouseY * scaleY) + (canvas.height / 2);
     
-    // Convert to canvas coordinates accounting for the scaling
+    // Ensure coordinates are within canvas bounds
+    const clampedX = Math.max(0, Math.min(canvasX, canvas.width));
+    const clampedY = Math.max(0, Math.min(canvasY, canvas.height));
+    
     return {
-      x: mouseX * scaleX,
-      y: mouseY * scaleY
+      x: clampedX,
+      y: clampedY
     };
   };
 
@@ -1008,6 +1026,37 @@ const Display = ({
     if (currentShape) {
       drawShape(ctx, currentShape);
     }
+    
+    // Debug: Draw click position indicator
+    if (debugClick && Date.now() - debugClick.timestamp < 3000) {
+      ctx.save();
+      ctx.strokeStyle = '#ff0000';
+      ctx.fillStyle = '#ff0000';
+      ctx.lineWidth = 2;
+      
+      // Draw crosshair at click position
+      ctx.beginPath();
+      ctx.moveTo(debugClick.x - 10, debugClick.y);
+      ctx.lineTo(debugClick.x + 10, debugClick.y);
+      ctx.moveTo(debugClick.x, debugClick.y - 10);
+      ctx.lineTo(debugClick.x, debugClick.y + 10);
+      ctx.stroke();
+      
+      // Draw circle at click position
+      ctx.beginPath();
+      ctx.arc(debugClick.x, debugClick.y, 3, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      // Draw detailed debug info
+      ctx.fillStyle = '#ff0000';
+      ctx.font = '10px Arial';
+      ctx.fillText(`Canvas: (${Math.round(debugClick.x)}, ${Math.round(debugClick.y)})`, debugClick.x + 15, debugClick.y - 25);
+      ctx.fillText(`Mouse: (${Math.round(debugClick.mouseX)}, ${Math.round(debugClick.mouseY)})`, debugClick.x + 15, debugClick.y - 15);
+      ctx.fillText(`Center: (${Math.round(debugClick.centerX)}, ${Math.round(debugClick.centerY)})`, debugClick.x + 15, debugClick.y - 5);
+      ctx.fillText(`Scale: ${debugClick.scaleX.toFixed(2)}x${debugClick.scaleY.toFixed(2)}`, debugClick.x + 15, debugClick.y + 5);
+      
+      ctx.restore();
+    }
   };
 
   // Update the eraseAtPoint function with better shape detection
@@ -1471,6 +1520,27 @@ const Display = ({
     }
     
     const coords = getCanvasCoordinates(e);
+    
+    // Debug: Show click position with detailed info
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    setDebugClick({ 
+      x: coords.x, 
+      y: coords.y, 
+      timestamp: Date.now(),
+      mouseX: e.clientX - centerX,
+      mouseY: e.clientY - centerY,
+      centerX: centerX,
+      centerY: centerY,
+      canvasWidth: canvas.width,
+      canvasHeight: canvas.height,
+      rectWidth: rect.width,
+      rectHeight: rect.height,
+      scaleX: canvas.width / rect.width,
+      scaleY: canvas.height / rect.height
+    });
 
     // Check for left-click
     if (isLeftClick(e)) {
