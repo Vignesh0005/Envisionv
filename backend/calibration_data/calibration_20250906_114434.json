@@ -1,0 +1,26 @@
+{
+    "magnification": "100x",
+    "pixelDistance": 460,
+    "realDistance": 7,
+    "unit": "cm",
+    "calibrationRatio": 0.015217391304347827,
+    "timestamp": "2025-09-06T06:14:33.983Z",
+    "imagePath": "C:\\Users\\Public\\MicroScope_Images\\d065c655c8da4f22957e1201f915c008-fHb3w-removebg-preview_1_20250906_112032.png",
+    "name": "",
+    "points": {
+        "point1": {
+            "x": 90,
+            "y": 190.79998779296875
+        },
+        "point2": {
+            "x": 550,
+            "y": 190.79998779296875
+        }
+    },
+    "coordinates": {
+        "point1X": 90,
+        "point1Y": 190.79998779296875,
+        "point2X": 550,
+        "point2Y": 190.79998779296875
+    }
+}
