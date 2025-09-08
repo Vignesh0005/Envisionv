@@ -1,0 +1,26 @@
+{
+    "magnification": "100x",
+    "pixelDistance": 101,
+    "realDistance": 100,
+    "unit": "mm",
+    "calibrationRatio": 0.9900990099009901,
+    "timestamp": "2025-09-05T06:45:50.748Z",
+    "imagePath": "C:\\Users\\Public\\MicroScope_Images\\stage_micrometer_1mm_20250905_120914.png",
+    "name": "100x",
+    "points": {
+        "point1": {
+            "x": 299,
+            "y": 119.79998779296875
+        },
+        "point2": {
+            "x": 400,
+            "y": 119.79998779296875
+        }
+    },
+    "coordinates": {
+        "point1X": 299,
+        "point1Y": 119.79998779296875,
+        "point2X": 400,
+        "point2Y": 119.79998779296875
+    }
+}

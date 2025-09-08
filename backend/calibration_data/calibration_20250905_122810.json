@@ -1,0 +1,26 @@
+{
+    "magnification": "100x",
+    "pixelDistance": 122,
+    "realDistance": 111,
+    "unit": "cm",
+    "calibrationRatio": 0.9098360655737705,
+    "timestamp": "2025-09-05T06:58:10.244Z",
+    "imagePath": "C:\\Users\\Public\\MicroScope_Images\\microscope_100x_20250814_120046.jpg",
+    "name": "100",
+    "points": {
+        "point1": {
+            "x": 164,
+            "y": 352.8000030517578
+        },
+        "point2": {
+            "x": 286,
+            "y": 352.8000030517578
+        }
+    },
+    "coordinates": {
+        "point1X": 164,
+        "point1Y": 352.8000030517578,
+        "point2X": 286,
+        "point2Y": 352.8000030517578
+    }
+}

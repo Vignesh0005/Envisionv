@@ -1,0 +1,67 @@
+.loading-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.envison-text {
+  font-family: 'Poppins', sans-serif; /* Modern and Professional Font */
+  font-size: 72px; /* Bigger and More Impactful */
+  font-weight: 800; /* Extra Bold for Emphasis */
+  letter-spacing: 1px; /* More Spacing for Elegance */
+  transition: all 1s ease;
+  opacity: 0;
+  transform: translateY(40px);
+  color: #212529; /* Deep Dark Gray for Premium Feel */
+  text-transform: uppercase; /* Makes It More Striking */
+  text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1); /* Soft Shadow for Depth */
+}
+
+@media (min-width: 768px) {
+  .envison-text {
+      font-size: 96px; /* Even Bigger on Larger Screens */
+  }
+}
+
+.envison-text.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dots-container {
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  background-color: #007bff; /* Professional Blue */
+  transition: all 0.3s ease;
+}
+
+.dot.animate {
+  animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+      transform: translateY(0);
+  }
+  50% {
+      transform: translateY(-10px);
+  }
+}
+
