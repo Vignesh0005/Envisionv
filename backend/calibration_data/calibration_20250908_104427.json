@@ -1,0 +1,26 @@
+{
+    "magnification": "100Xx",
+    "pixelDistance": 350.84892086330956,
+    "realDistance": 100,
+    "unit": "mm",
+    "calibrationRatio": 0.2850229658792649,
+    "timestamp": "2025-09-08T05:14:27.632Z",
+    "imagePath": null,
+    "name": "100X Calibration",
+    "points": {
+        "point1": {
+            "x": 1373.0071942446043,
+            "y": 1020.1163182721109
+        },
+        "point2": {
+            "x": 1723.8561151079139,
+            "y": 1020.1163182721109
+        }
+    },
+    "coordinates": {
+        "point1X": 1373.0071942446043,
+        "point1Y": 1020.1163182721109,
+        "point2X": 1723.8561151079139,
+        "point2Y": 1020.1163182721109
+    }
+}
