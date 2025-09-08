@@ -82,13 +82,6 @@ function createWindow() {
         }
     });
 
-    // Configure session to allow localhost requests
-    const { session } = require('electron');
-    session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
-        details.requestHeaders['User-Agent'] = 'Electron';
-        callback({ cancel: false, requestHeaders: details.requestHeaders });
-    });
-
     // Always use the built files
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
 

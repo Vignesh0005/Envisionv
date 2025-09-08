@@ -213,6 +213,8 @@ const Navbar = ({ imagePath, setImagePath, currentImageUrl, onClearWorkspace, ad
             })
         });
 
+        const data = await response.json();
+
         if (data.status === 'success') {
             setImagePath(data.filepath);
             if (addToImageHistory) {
