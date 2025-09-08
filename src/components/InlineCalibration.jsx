@@ -11,7 +11,8 @@ const InlineCalibration = ({ imagePath, onCalibrationComplete, onClose, setCalib
   const [pixelDistance, setPixelDistance] = useState(0);
   const [realDistance, setRealDistance] = useState('');
   const [realDistanceUnit, setRealDistanceUnit] = useState('mm');
-  const [magnification, setMagnification] = useState('100X');
+  const [magnification, setMagnification] = useState('100');
+  const [calibrationName, setCalibrationName] = useState('');
   const [calibrationRatio, setCalibrationRatio] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [mouseCoordinates, setMouseCoordinates] = useState({ x: 0, y: 0 });
@@ -138,7 +139,7 @@ const InlineCalibration = ({ imagePath, onCalibrationComplete, onClose, setCalib
       calibrationRatio,
       timestamp: new Date().toISOString(),
       imagePath: imagePath,
-      name: `${magnification} Calibration`,
+      name: calibrationName,
       points: {
         point1: {
           x: calibrationPoints.point1.x,
@@ -222,18 +223,24 @@ const InlineCalibration = ({ imagePath, onCalibrationComplete, onClose, setCalib
               <div>
                 <Text strong className="text-sm">Magnification <span className="text-red-500">*</span></Text>
                 <Input
-                  value={magnification.replace('X', '')}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/[^0-9]/g, ''); // Only allow numbers
-                    setMagnification(value + 'X');
-                  }}
+                  value={magnification}
+                  onChange={(e) => setMagnification(e.target.value)}
                   placeholder="100"
                   size="small"
                   style={{ width: '100%' }}
-                  suffix="X"
                 />
               </div>
 
+              <div>
+                <Text strong className="text-sm">Name (Optional)</Text>
+                <Input
+                  value={calibrationName}
+                  onChange={(e) => setCalibrationName(e.target.value)}
+                  placeholder="Enter calibration name"
+                  size="small"
+                  style={{ width: '100%' }}
+                />
+              </div>
 
               <div>
                 <Text strong className="text-sm">Unit</Text>
@@ -466,8 +473,8 @@ const InlineCalibration = ({ imagePath, onCalibrationComplete, onClose, setCalib
             <div className="bg-blue-50 p-3 rounded">
               <Text strong className="text-sm text-blue-800">Calibration Details:</Text>
               <div className="mt-2 text-xs text-blue-700 space-y-1">
-                <div>Name: {magnification} Calibration</div>
-                <div>Magnification: {magnification}</div>
+                <div>Name: {calibrationName || 'Unnamed'}</div>
+                <div>Magnification: {magnification}x</div>
                 <div>Unit: {realDistanceUnit}</div>
                 <div>Pixel Distance: {pixelDistance.toFixed(2)} px</div>
                 <div>Real Distance: {realDistance} {realDistanceUnit}</div>

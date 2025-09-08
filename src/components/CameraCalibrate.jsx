@@ -575,7 +575,7 @@ const CameraCalibrate = ({ imagePath }) => {
     }));
 
       // Show success message
-      alert(`Using ${calibration.magnification} calibration (${calibration.calibrationFactor.toFixed(4)} px/${calibration.unit || 'px'})`);
+      alert(`Using ${calibration.magnification} calibration (${calibration.calibrationFactor.toFixed(4)} px/μm)`);
     } catch (error) {
       console.error('Error using calibration:', error);
       alert('Error applying calibration: ' + error.message);
@@ -689,7 +689,7 @@ const CameraCalibrate = ({ imagePath }) => {
           </div>
           <p className="text-sm text-gray-600 mt-1">
             {selectedExistingCalibration ? 
-              `Using ${selectedExistingCalibration.magnification} calibration (${selectedExistingCalibration.calibrationFactor.toFixed(4)} px/${selectedExistingCalibration.unit || 'px'})` : 
+              `Using ${selectedExistingCalibration.magnification} calibration (${selectedExistingCalibration.calibrationFactor.toFixed(4)} px/μm)` : 
               'Calibrate your microscope camera for precise measurements'}
           </p>
       </div>
@@ -795,7 +795,7 @@ const CameraCalibrate = ({ imagePath }) => {
                         <h4 className="text-sm font-medium text-gray-800">{mag}</h4>
                         <div className="mt-1 space-y-0.5">
                           <p className="text-xs text-gray-600">
-                            Scale: {calibration.calibrationFactor.toFixed(4)} px/{calibration.unit || 'px'}
+                            Scale: {calibration.calibrationFactor.toFixed(4)} px/μm
                           </p>
                           <p className="text-xs text-gray-500">
                             {new Date(calibration.timestamp).toLocaleDateString()}

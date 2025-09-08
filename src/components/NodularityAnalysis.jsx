@@ -18,7 +18,6 @@ const NodularityAnalysis = ({ onClose, imagePath, imageUrl }) => {
   const [error, setError] = useState(null)
   const [displayedImage, setDisplayedImage] = useState(null)
   const [histogramData, setHistogramData] = useState(null)
-  const [currentCalibration, setCurrentCalibration] = useState(null)
   const [selectedFeature, setSelectedFeature] = useState(null)
   const [showConfigDialog, setShowConfigDialog] = useState(false)
   const [configName, setConfigName] = useState("")
@@ -133,25 +132,6 @@ const NodularityAnalysis = ({ onClose, imagePath, imageUrl }) => {
     
     img.src = imageUrl;
   };
-
-  // Listen for calibration changes
-  useEffect(() => {
-    const handleCalibrationChange = (event) => {
-      setCurrentCalibration(event.detail.calibration);
-    };
-
-    window.addEventListener('calibrationChanged', handleCalibrationChange);
-    
-    // Load existing calibration
-    const savedCalibration = localStorage.getItem('currentCalibration');
-    if (savedCalibration) {
-      setCurrentCalibration(JSON.parse(savedCalibration));
-    }
-
-    return () => {
-      window.removeEventListener('calibrationChanged', handleCalibrationChange);
-    };
-  }, []);
 
   useEffect(() => {
     console.log('NodularityAnalysis useEffect triggered:', { imagePath, imageUrl });
@@ -587,8 +567,8 @@ const NodularityAnalysis = ({ onClose, imagePath, imageUrl }) => {
                 <thead>
                   <tr>
                     <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider pb-4">Size</th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider pb-4">Min ({currentCalibration?.unit || 'px'})</th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider pb-4">Max ({currentCalibration?.unit || 'px'})</th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider pb-4">Min (µm)</th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider pb-4">Max (µm)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">

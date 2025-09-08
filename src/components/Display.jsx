@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo, memo } from 'react';
 import envisionLogo from '../assest/envision.png'; // Import the logo
 
 const Display = ({ 
@@ -218,10 +218,10 @@ const Display = ({
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
     
-    // Convert to canvas coordinates accounting for the scaling and centering
+    // Convert to canvas coordinates accounting for the scaling, centering, and zoom
     // Add half the canvas size to get the correct position
-    const canvasX = (mouseX * scaleX) + (canvas.width / 2);
-    const canvasY = (mouseY * scaleY) + (canvas.height / 2);
+    const canvasX = ((mouseX * scaleX) + (canvas.width / 2)) / zoom;
+    const canvasY = ((mouseY * scaleY) + (canvas.height / 2)) / zoom;
     
     // Ensure coordinates are within canvas bounds
     const clampedX = Math.max(0, Math.min(canvasX, canvas.width));
@@ -1254,20 +1254,20 @@ const Display = ({
           Math.pow(shape.end.y - shape.start.y, 2)
         );
         updatedShape.calibratedDistance = parseFloat((pixelDistance * calibrationRatio).toFixed(11));
-        updatedShape.unit = newCalibration.unit || 'px';
+        updatedShape.unit = newCalibration.unit || 'µm';
       } else if (shape.type === 'rectangle') {
         const width = Math.abs(shape.end.x - shape.start.x);
         const height = Math.abs(shape.end.y - shape.start.y);
         updatedShape.calibratedWidth = parseFloat((width * calibrationRatio).toFixed(11));
         updatedShape.calibratedHeight = parseFloat((height * calibrationRatio).toFixed(11));
         updatedShape.calibratedArea = parseFloat((updatedShape.calibratedWidth * updatedShape.calibratedHeight).toFixed(11));
-        updatedShape.unit = newCalibration.unit || 'px';
+        updatedShape.unit = newCalibration.unit || 'µm';
       } else if (shape.type === 'circle') {
         if (shape.radius) {
           updatedShape.calibratedRadius = parseFloat((shape.radius * calibrationRatio).toFixed(11));
           updatedShape.calibratedDiameter = parseFloat((updatedShape.calibratedRadius * 2).toFixed(11));
           updatedShape.calibratedArea = parseFloat((Math.PI * updatedShape.calibratedRadius * updatedShape.calibratedRadius).toFixed(11));
-          updatedShape.unit = newCalibration.unit || 'px';
+          updatedShape.unit = newCalibration.unit || 'µm';
         }
       } else if (shape.type === 'curve') {
         // Calculate curve length
@@ -1281,7 +1281,7 @@ const Display = ({
           }
         }
         updatedShape.calibratedLength = parseFloat((length * calibrationRatio).toFixed(11));
-        updatedShape.unit = newCalibration.unit || 'px';
+        updatedShape.unit = newCalibration.unit || 'µm';
       } else if (shape.type === 'closedCurve') {
         // Calculate closed curve area using shoelace formula
         let area = 0;
@@ -1293,7 +1293,7 @@ const Display = ({
           area = Math.abs(area) / 2;
         }
         updatedShape.calibratedArea = parseFloat((area * calibrationRatio * calibrationRatio).toFixed(11));
-        updatedShape.unit = newCalibration.unit || 'px';
+        updatedShape.unit = newCalibration.unit || 'µm';
       } else if (shape.type === 'arc') {
         if (shape.points && shape.points.length === 3) {
           const [p1, p2, p3] = shape.points;
@@ -1318,7 +1318,7 @@ const Display = ({
           updatedShape.calibratedRadius = parseFloat((radius * calibrationRatio).toFixed(11));
           updatedShape.calibratedArcLength = parseFloat((arcLength * calibrationRatio).toFixed(11));
           updatedShape.calibratedAngle = parseFloat(angle.toFixed(1));
-          updatedShape.unit = newCalibration.unit || 'px';
+          updatedShape.unit = newCalibration.unit || 'µm';
         }
       }
       // Note: 'angle' type doesn't need calibration as it's measured in degrees
@@ -1390,8 +1390,8 @@ const Display = ({
     }
   }, [isCalibrationMode, calibrationCallback]);
 
-  // Helper function to convert pixels to real-world units
-  const pixelsToRealUnits = (pixels) => {
+  // Helper function to convert pixels to microns
+  const pixelsToMicrons = (pixels) => {
     if (!currentCalibration) return pixels;
     
     // Handle different calibration data structures
@@ -1812,7 +1812,7 @@ const Display = ({
         ctx.stroke();
 
         // Use pre-calculated calibrated distance if available, otherwise calculate
-        const realDistance = shape.calibratedDistance || parseFloat(pixelsToRealUnits(Math.sqrt(
+        const micronsDistance = shape.calibratedDistance || parseFloat(pixelsToMicrons(Math.sqrt(
           Math.pow(shape.end.x - shape.start.x, 2) + 
           Math.pow(shape.end.y - shape.start.y, 2)
         )).toFixed(11));
@@ -1825,8 +1825,8 @@ const Display = ({
         ctx.font = 'bold 14px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        const unit = shape.unit || (currentCalibration?.unit || 'px');
-        ctx.fillText(`${Math.round(realDistance)} ${unit}`, midX, midY);
+        const unit = shape.unit || 'µm';
+        ctx.fillText(`${Math.round(micronsDistance)} ${unit}`, midX, midY);
         break;
       }
       case 'rectangle': {
@@ -1839,9 +1839,9 @@ const Display = ({
         ctx.stroke();
         
         // Use pre-calculated calibrated measurements if available, otherwise calculate
-        const widthReal = shape.calibratedWidth || parseFloat(pixelsToRealUnits(width).toFixed(11));
-        const heightReal = shape.calibratedHeight || parseFloat(pixelsToRealUnits(height).toFixed(11));
-        const areaReal = shape.calibratedArea || parseFloat((widthReal * heightReal).toFixed(11));
+        const widthMicrons = shape.calibratedWidth || parseFloat(pixelsToMicrons(width).toFixed(11));
+        const heightMicrons = shape.calibratedHeight || parseFloat(pixelsToMicrons(height).toFixed(11));
+        const areaMicrons = shape.calibratedArea || parseFloat((widthMicrons * heightMicrons).toFixed(11));
 
         // Display measurements
         const centerX = shape.start.x + width/2;
@@ -1851,9 +1851,9 @@ const Display = ({
         ctx.font = 'bold 14px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        const unit = shape.unit || (currentCalibration?.unit || 'px');
-        ctx.fillText(`${widthReal} × ${heightReal} ${unit}`, centerX, centerY - 10);
-        ctx.fillText(`Area: ${areaReal} ${unit}²`, centerX, centerY + 10);
+        const unit = shape.unit || 'µm';
+        ctx.fillText(`${widthMicrons} × ${heightMicrons} ${unit}`, centerX, centerY - 10);
+        ctx.fillText(`Area: ${areaMicrons} ${unit}²`, centerX, centerY + 10);
         break;
       }
       case 'circle': {
@@ -1901,17 +1901,17 @@ const Display = ({
           });
           
           // Use pre-calculated calibrated measurements if available, otherwise calculate
-          const radiusReal = shape.calibratedRadius || parseFloat(pixelsToRealUnits(radius).toFixed(11));
-          const areaReal = shape.calibratedArea || parseFloat((Math.PI * radiusReal * radiusReal).toFixed(11));
+          const radiusMicrons = shape.calibratedRadius || parseFloat(pixelsToMicrons(radius).toFixed(11));
+          const areaMicrons = shape.calibratedArea || parseFloat((Math.PI * radiusMicrons * radiusMicrons).toFixed(11));
           
           // Display measurements
           ctx.fillStyle = '#000000';
           ctx.font = 'bold 14px Arial';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          const unit = shape.unit || (currentCalibration?.unit || 'px');
-          ctx.fillText(`R: ${radiusReal} ${unit}`, center.x, center.y - 15);
-          ctx.fillText(`Area: ${areaReal} ${unit}²`, center.x, center.y + 5);
+          const unit = shape.unit || 'µm';
+          ctx.fillText(`R: ${radiusMicrons} ${unit}`, center.x, center.y - 15);
+          ctx.fillText(`Area: ${areaMicrons} ${unit}²`, center.x, center.y + 5);
         } else if (shape.points && shape.points.length === 2) {
           // Draw preview line
           ctx.beginPath();
@@ -1954,15 +1954,15 @@ const Display = ({
               Math.pow(shape.points[i].y - shape.points[i-1].y, 2)
             );
           }
-          const lengthReal = shape.calibratedLength || parseFloat(pixelsToRealUnits(length).toFixed(11));
+          const lengthMicrons = shape.calibratedLength || parseFloat(pixelsToMicrons(length).toFixed(11));
 
           // Display length
           const lastPoint = shape.points[shape.points.length - 1];
           ctx.fillStyle = '#000000';
           ctx.font = 'bold 14px Arial';
           ctx.textAlign = 'left';
-          const unit = shape.unit || (currentCalibration?.unit || 'px');
-          ctx.fillText(`${lengthReal} ${unit}`, lastPoint.x + 15, lastPoint.y);
+          const unit = shape.unit || 'µm';
+          ctx.fillText(`${lengthMicrons} ${unit}`, lastPoint.x + 15, lastPoint.y);
         }
         break;
       }
@@ -1984,15 +1984,15 @@ const Display = ({
                       shape.points[i + 1].x * shape.points[i].y;
             }
             area = Math.abs(area) / 2;
-          const areaReal = shape.calibratedArea || parseFloat(pixelsToRealUnits(area).toFixed(11));
+          const areaMicrons = shape.calibratedArea || parseFloat(pixelsToMicrons(area).toFixed(11));
 
           // Display area
           const lastPoint = shape.points[shape.points.length - 1];
           ctx.fillStyle = '#000000';
           ctx.font = 'bold 14px Arial';
           ctx.textAlign = 'left';
-          const unit = shape.unit || (currentCalibration?.unit || 'px');
-          ctx.fillText(`${areaReal} ${unit}²`, lastPoint.x + 15, lastPoint.y);
+          const unit = shape.unit || 'µm';
+          ctx.fillText(`${areaMicrons} ${unit}²`, lastPoint.x + 15, lastPoint.y);
         }
         break;
       }
@@ -2047,8 +2047,8 @@ const Display = ({
           // Use pre-calculated calibrated measurements if available, otherwise calculate
           const arcLength = Math.abs(endAngle - startAngle) * radius;
           const angle = Math.abs((endAngle - startAngle) * (180 / Math.PI));
-          const radiusReal = shape.calibratedRadius || parseFloat(pixelsToRealUnits(radius).toFixed(11));
-          const arcLengthReal = shape.calibratedArcLength || parseFloat(pixelsToRealUnits(arcLength).toFixed(11));
+          const radiusMicrons = shape.calibratedRadius || parseFloat(pixelsToMicrons(radius).toFixed(11));
+          const arcLengthMicrons = shape.calibratedArcLength || parseFloat(pixelsToMicrons(arcLength).toFixed(11));
           const angleDegrees = shape.calibratedAngle || parseFloat(angle.toFixed(1));
           
           // Display measurements
@@ -2058,9 +2058,9 @@ const Display = ({
           ctx.fillStyle = '#000000';
           ctx.font = 'bold 14px Arial';
           ctx.textAlign = 'left';
-          const unit = shape.unit || (currentCalibration?.unit || 'px');
-          ctx.fillText(`R: ${radiusReal}${unit}`, textX - 55, textY - 30);
-          ctx.fillText(`L: ${arcLengthReal}${unit}`, textX - 55, textY - 15);
+          const unit = shape.unit || 'µm';
+          ctx.fillText(`R: ${radiusMicrons}${unit}`, textX - 55, textY - 30);
+          ctx.fillText(`L: ${arcLengthMicrons}${unit}`, textX - 55, textY - 15);
           ctx.fillText(`A: ${angleDegrees}°`, textX - 55, textY);
         } else if (shape.points && shape.points.length === 2) {
           // Draw preview line
@@ -2626,27 +2626,15 @@ const Display = ({
 
   // Add unified undo function
   const handleUndo = useCallback(() => {
-    console.log('handleUndo called');
-    console.log('imageHistory:', imageHistory);
-    console.log('imageHistoryIndex:', imageHistoryIndex);
-    console.log('imageHistory.length:', imageHistory ? imageHistory.length : 0);
-    console.log('handleImageUndo exists:', !!handleImageUndo);
-    
     // First try to undo image operations
     if (imageHistory && imageHistory.length > 1 && imageHistoryIndex > 0 && handleImageUndo) {
-      console.log('Undoing image operation');
       handleImageUndo();
     }
     // Then try to undo shape operations
     else if (historyIndex > 0) {
-      console.log('Undoing shape operation');
       const newIndex = historyIndex - 1;
       setHistoryIndex(newIndex);
       onShapesUpdate(history[newIndex]);
-    } else {
-      console.log('Nothing to undo');
-      console.log('imageHistory.length > 1:', imageHistory ? imageHistory.length > 1 : false);
-      console.log('imageHistoryIndex > 0:', imageHistoryIndex > 0);
     }
   }, [imageHistory, imageHistoryIndex, handleImageUndo, historyIndex, history, onShapesUpdate]);
 
@@ -2663,6 +2651,15 @@ const Display = ({
       onShapesUpdate(history[newIndex]);
     }
   }, [imageHistory, imageHistoryIndex, handleImageRedo, historyIndex, history, onShapesUpdate]);
+
+  // Memoize button states for performance
+  const undoEnabled = useMemo(() => {
+    return (imageHistory && imageHistory.length > 1 && imageHistoryIndex > 0) || historyIndex > 0;
+  }, [imageHistory, imageHistoryIndex, historyIndex]);
+
+  const redoEnabled = useMemo(() => {
+    return (imageHistory && imageHistory.length > 0 && imageHistoryIndex < imageHistory.length - 1) || historyIndex < history.length - 1;
+  }, [imageHistory, imageHistoryIndex, historyIndex, history.length]);
 
   // Add keyboard shortcuts for undo/redo
   useEffect(() => {
@@ -2696,26 +2693,17 @@ const Display = ({
       {/* Undo/Redo Buttons */}
       <div className="absolute top-2 right-2 flex gap-2 z-10">
         <button
-          className={`p-2 rounded ${(imageHistory && imageHistory.length > 1 && imageHistoryIndex > 0) || historyIndex > 0 ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-400'} text-white`}
-          onClick={() => {
-            console.log('Undo button clicked');
-            console.log('Button state - imageHistory:', imageHistory);
-            console.log('Button state - imageHistoryIndex:', imageHistoryIndex);
-            console.log('Button state - historyIndex:', historyIndex);
-            handleUndo();
-          }}
-          disabled={(!imageHistory || imageHistory.length <= 1 || imageHistoryIndex === 0) && historyIndex === 0}
+          className={`p-2 rounded ${undoEnabled ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-400'} text-white`}
+          onClick={handleUndo}
+          disabled={!undoEnabled}
           title="Undo (Ctrl+Z)"
         >
           Undo
         </button>
         <button
-          className={`p-2 rounded ${(imageHistory && imageHistory.length > 0 && imageHistoryIndex < imageHistory.length - 1) || historyIndex < history.length - 1 ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-400'} text-white`}
-          onClick={() => {
-            console.log('Redo button clicked');
-            handleRedo();
-          }}
-          disabled={(!imageHistory || imageHistory.length === 0 || imageHistoryIndex === imageHistory.length - 1) && historyIndex === history.length - 1}
+          className={`p-2 rounded ${redoEnabled ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-400'} text-white`}
+          onClick={handleRedo}
+          disabled={!redoEnabled}
           title="Redo (Ctrl+Y or Ctrl+Shift+Z)"
         >
           Redo

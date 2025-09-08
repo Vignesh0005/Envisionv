@@ -16,27 +16,7 @@ const DeCarburization = ({ onClose, imagePath, imageUrl }) => {
     stdDev: 0
   });
   const [results, setResults] = useState([]);
-  const [currentCalibration, setCurrentCalibration] = useState(null);
   const canvasRef = useRef(null);
-
-  // Listen for calibration changes
-  useEffect(() => {
-    const handleCalibrationChange = (event) => {
-      setCurrentCalibration(event.detail.calibration);
-    };
-
-    window.addEventListener('calibrationChanged', handleCalibrationChange);
-    
-    // Load existing calibration
-    const savedCalibration = localStorage.getItem('currentCalibration');
-    if (savedCalibration) {
-      setCurrentCalibration(JSON.parse(savedCalibration));
-    }
-
-    return () => {
-      window.removeEventListener('calibrationChanged', handleCalibrationChange);
-    };
-  }, []);
 
   useEffect(() => {
     console.log('DeCarburization: Component mounted with props:', {
@@ -249,7 +229,7 @@ const DeCarburization = ({ onClose, imagePath, imageUrl }) => {
       {/* Summary Box */}
       <div className="bg-gray-50 border rounded p-4 mb-4 flex flex-wrap gap-4 items-end">
         <div className="flex flex-col text-xs mr-4">
-          <span className="font-semibold text-red-700 mb-1">Unit: {currentCalibration?.unit || 'px'}</span>
+          <span className="font-semibold text-red-700 mb-1">Unit: Microns</span>
           <div className="flex gap-2 mb-1">
             <label className="w-20">Min</label>
             <input className="w-16 border rounded px-1 py-0.5 text-xs" readOnly value={measurements.min} />
@@ -281,7 +261,7 @@ const DeCarburization = ({ onClose, imagePath, imageUrl }) => {
       </div>
       {/* Results Table */}
       <div className="mb-4">
-        <div className="flex justify-end text-xs text-red-700 font-semibold mb-1">Unit: {currentCalibration?.unit || 'px'}</div>
+        <div className="flex justify-end text-xs text-red-700 font-semibold mb-1">Unit: Microns</div>
         <div className="overflow-x-auto">
           <table className="w-full text-xs border">
             <thead className="bg-gray-100">

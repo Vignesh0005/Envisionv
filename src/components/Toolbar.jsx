@@ -450,7 +450,7 @@ const Toolbar = ({
               {calibrationInfo && (
                 <div className="flex items-center text-xs text-gray-600 ml-2">
                   <span className="bg-green-50 px-2 py-1 rounded-full border border-green-200 text-green-700">
-                    {calibrationInfo.magnification} • 1px = {calibrationInfo.calibrationRatio?.toFixed(11) || 'NaN'} {calibrationInfo.unit || 'px'}
+                    {calibrationInfo.magnification} • 1px = {calibrationInfo.calibrationRatio?.toFixed(11) || 'NaN'} {calibrationInfo.unit || 'μm'}
                   </span>
                 </div>
               )}
